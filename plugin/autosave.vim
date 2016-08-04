@@ -32,6 +32,7 @@ com! EnableAutoSave  :let g:autosave=1 | call <sid>SetupTimer(g:autosave)
 let g:autosave_extension  = get(g:, 'autosave_extension', '.backup')
 " by default write every 5 minutes
 let g:autosave_timer      = get(g:, 'autosave_timer', 60*5) * 1000
+let g:autosave_changenr   = {}
 
 " functions {{{1
 func! Autosave_DoSave(timer) "{{{2
@@ -57,6 +58,10 @@ func! <sid>SaveBuffer() "{{{2
   \  !empty(&buftype) ||
   \  get(b:, 'autosave_disabled', 0)
       return
+  endif
+  if get(get(g:, 'autosave_changenr', {}), bufnr('%')) == changenr()
+    " buffer saved last time and hasn't changed
+    return
   endif
   let saved=0
   for dir in g:autosave_backupdir
