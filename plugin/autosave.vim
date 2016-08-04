@@ -73,8 +73,13 @@ func! <sid>SaveBuffer() "{{{2
       continue
     endif
     try
-      exe ":w!" dir.'/'. fnameescape(filename). g:autosave_extension
+      let name = dir. '/'. fnameescape(filename). g:autosave_extension
+      exe ":w!" name
       let saved=1
+      if get(g:, 'autosave_debug', 0)
+        echomsg printf("%s saved at %s", name, strftime('%H:%M:%S'))
+      endif
+      let g:autosave_changenr[bufnr('%')] = changenr()
       break
     catch
     endtry
