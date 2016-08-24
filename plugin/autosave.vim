@@ -44,7 +44,11 @@ func! Autosave_DoSave(timer) "{{{2
   let g:autosave_errors=[]
   " replace escaped commas with commas
   call map(g:autosave_backupdir, 'substitute(v:val, ''\\,'', ",", "g")')
-  noa bufdo call <sid>SaveBuffer()
+  " bufdo is not allowed in the sandbox
+  try
+    noa bufdo call <sid>SaveBuffer()
+  catch
+  endtry
   exe ":noa ". bufnr."b!" 
   call <sid>Warning(g:autosave_errors)
 endfunc
