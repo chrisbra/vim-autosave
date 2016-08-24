@@ -20,6 +20,7 @@ elseif !has('timers')
     echohl WarningMsg
     echomsg "The vim-autosave Plugin needs at least a Vim version 7.4 (with +timers support)"
     echohl Normal
+    finish
 endif
 set cpo&vim
 let g:loaded_autosave = 1
