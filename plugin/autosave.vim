@@ -45,46 +45,57 @@ func! Autosave_DoSave(timer) "{{{2
   let g:autosave_errors=[]
   " replace escaped commas with commas
   call map(g:autosave_backupdir, 'substitute(v:val, ''\\,'', ",", "g")')
-  " bufdo is not allowed in the sandbox
-  try
-    noa bufdo call <sid>SaveBuffer()
-  catch
-  endtry
-  exe ":noa ". bufnr."b!" 
+  for nr in range(1, bufnr('$'))
+    call <sid>SaveBuffer(nr)
+  endfor
   call <sid>Warning(g:autosave_errors)
 endfunc
-func! <sid>SaveBuffer() "{{{2
+func! <sid>SaveBuffer(nr) "{{{2
+  if !bufexists(a:nr)
+    return
+  endif
   " don't try to save special buffers (help)
   " unmodified files or buffers without a name
   " or buffers, for which the buffer-local variable
   " 'autosave_disabled' has been set
-  if !&modified ||
-  \  empty(bufname('%')) ||
-  \  !empty(&buftype) ||
-  \  get(b:, 'autosave_disabled', 0)
+  let bufname = bufname(a:nr + 0)
+  if !getbufvar(a:nr, '&modified') ||
+  \  empty(bufname) ||
+  \  !empty(getbufvar(a:nr, '&buftype')) ||
+  \  getbufvar(a:nr, 'autosave_disabled', 0)
       return
   endif
-  if get(get(g:, 'autosave_changenr', {}), bufnr('%')) == changenr()
-    " buffer saved last time and hasn't changed
-    return
+  if 0
+    " not possible, without jumping to the buffer
+    if get(get(g:, 'autosave_changenr', {}), a:nr) == changenr()
+      " buffer saved last time and hasn't changed
+      return
+    endif
   endif
   let saved=0
   for dir in g:autosave_backupdir
     if dir is# '.'
-      let dir = expand('%:p:h')
+      let dir = fnamemodify(bufname, ':p:h')
     endif
-    let filename = expand('%:t')
+    let filename = fnamemodify(bufname, '%:t')
     if !isdirectory(dir)
       continue
     endif
     try
+      let cnt = getbufline(a:nr, 1, '$')
       let name = dir. '/'. fnameescape(filename). g:autosave_extension
-      exe ":w!" name
+      if getbufvar(a:nr, '&ff') is# unix
+        " write as unix file
+        call writefile(cnt, name)
+      else
+        " write as dos file
+        call writefile(map(cnt, 'v:val."\r"'), name)
+      endif
       let saved=1
       if get(g:, 'autosave_debug', 0)
         echomsg printf("%s saved at %s", name, strftime('%H:%M:%S'))
       endif
-      let g:autosave_changenr[bufnr('%')] = changenr()
+      "let g:autosave_changenr[bufnr('%')] = changenr()
       break
     catch
     endtry
