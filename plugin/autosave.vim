@@ -84,7 +84,7 @@ func! <sid>SaveBuffer(nr) "{{{2
     try
       let cnt = getbufline(a:nr, 1, '$')
       let name = dir. '/'. fnameescape(filename). g:autosave_extension
-      if getbufvar(a:nr, '&ff') is# unix
+      if getbufvar(a:nr, '&ff') is# 'unix'
         " write as unix file
         call writefile(cnt, name)
       else
