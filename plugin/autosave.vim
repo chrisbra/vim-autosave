@@ -65,12 +65,9 @@ func! <sid>SaveBuffer(nr) "{{{2
   \  getbufvar(a:nr, 'autosave_disabled', 0)
       return
   endif
-  if 0
-    " not possible, without jumping to the buffer
-    if get(get(g:, 'autosave_changenr', {}), a:nr) == changenr()
-      " buffer saved last time and hasn't changed
-      return
-    endif
+  if get(get(g:, 'autosave_changenr', {}), a:nr+0) == getbufvar(a:nr+0, 'changedtick')
+    " buffer saved last time and hasn't changed
+    return
   endif
   let saved=0
   for dir in g:autosave_backupdir
@@ -95,7 +92,7 @@ func! <sid>SaveBuffer(nr) "{{{2
       if get(g:, 'autosave_debug', 0)
         echomsg printf("%s saved at %s", name, strftime('%H:%M:%S'))
       endif
-      "let g:autosave_changenr[bufnr('%')] = changenr()
+      let g:autosave_changenr[a:nr+0] = getbufvar(a:nr+0, 'changedtick')
       break
     catch
     endtry
