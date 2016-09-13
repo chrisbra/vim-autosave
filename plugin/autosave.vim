@@ -50,6 +50,7 @@ func! Autosave_DoSave(timer) "{{{2
   endfor
   call <sid>Warning(g:autosave_errors)
 endfunc
+
 func! <sid>SaveBuffer(nr) "{{{2
   if !bufexists(a:nr)
     return
@@ -74,7 +75,7 @@ func! <sid>SaveBuffer(nr) "{{{2
     if dir is# '.'
       let dir = fnamemodify(bufname, ':p:h')
     endif
-    let filename = fnamemodify(bufname, '%:t')
+    let filename = fnamemodify(bufname, ':t')
     if !isdirectory(dir)
       continue
     endif
@@ -101,6 +102,7 @@ func! <sid>SaveBuffer(nr) "{{{2
     call add(g:autosave_errors, filename)
   endif
 endfunc
+
 func! <sid>SetupTimer(enable) "{{{2
   if a:enable
     let s:autosave_timer=timer_start(g:autosave_timer, 'Autosave_DoSave', {'repeat': -1})
@@ -108,6 +110,7 @@ func! <sid>SetupTimer(enable) "{{{2
     call timer_stop(s:autosave_timer)
   endif
 endfunc
+
 func! <sid>Warning(list) "{{{2
   if empty(a:list)
     return
@@ -123,6 +126,7 @@ endfun
 
 let g:autosave = get(g:, 'autosave', 1)
 call <sid>SetupTimer(g:autosave)
+
 " Restore: "{{{1
 let &cpo=s:cpo
 unlet s:cpo
