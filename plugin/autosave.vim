@@ -16,30 +16,28 @@
 let s:cpo= &cpo
 if exists("g:loaded_autosave") || &cp
     finish
-elseif !has('timers')
+elseif !has('timers') || !has('float')
     echohl WarningMsg
-    echomsg "The vim-autosave Plugin needs at least a Vim version 7.4 (with +timers support)"
+    echomsg "The vim-autosave Plugin needs at least a Vim version 8 (with +timers and +float support)"
     echohl Normal
     finish
 endif
 set cpo&vim
 let g:loaded_autosave = 1
 
-" public interface {{{1
-com! DisableAutoSave :let g:autosave=0 | call <sid>SetupTimer(g:autosave)
-com! EnableAutoSave  :let g:autosave=1 | call <sid>SetupTimer(g:autosave)
-
-" Configuration variabnles
+" Configuration variables {{{1
 let g:autosave_extension  = get(g:, 'autosave_extension', '.backup')
 " by default write every 5 minutes
 let g:autosave_timer      = get(g:, 'autosave_timer', 60*5) * 1000
 let g:autosave_changenr   = {}
 
+" public interface {{{1
+com! -nargs=? AutoSave call <sid>SetupTimer(<q-args>)
+com! DisableAutoSave AutoSave 0
+com! EnableAutoSave  AutoSave g:autosave_timer
+
 " functions {{{1
-func! Autosave_DoSave(timer) "{{{2
-  if !get(g:, 'autosave', 1)
-    return
-  endif
+func! Autosave_DoSave(timer) abort "{{{2
   let bufnr=bufnr('')
   let g:autosave_backupdir=split(&bdir, '\\\@<!,')
   let g:autosave_errors=[]
@@ -51,7 +49,7 @@ func! Autosave_DoSave(timer) "{{{2
   call <sid>Warning(g:autosave_errors)
 endfunc
 
-func! <sid>SaveBuffer(nr) "{{{2
+func! <sid>SaveBuffer(nr) abort "{{{2
   if !bufexists(a:nr)
     return
   endif
@@ -103,30 +101,63 @@ func! <sid>SaveBuffer(nr) "{{{2
   endif
 endfunc
 
-func! <sid>SetupTimer(enable) "{{{2
-  if a:enable
-    let s:autosave_timer=timer_start(g:autosave_timer, 'Autosave_DoSave', {'repeat': -1})
+func! <sid>Num(nr) abort "{{{2
+  return (a:nr+0.0)/1000
+endfu
+
+func! <sid>SetupTimer(enable) abort "{{{2
+  let msg = ''
+  if empty(a:enable)
+    if exists('s:autosave_timer')
+      let info = timer_info(s:autosave_timer)
+      if empty(info)
+        let msg = 'AutoSave disabled'
+      elseif info[0].callback is# function('Autosave_DoSave')
+        let msg  = printf("AutoSave: %s (every %.0f seconds), triggers again in %.0f seconds",
+              \ (info[0].paused ? 'paused' : 'active'), <sid>Num(info[0].time),
+              \ <sid>Num(info[0].remaining))
+      else
+        let msg = printf("Unknown timer")
+      endif
+    else
+      let msg = "No AutoSave Timer active"
+    endif
+  elseif a:enable
+    if a:enable > 100 * 60 * 1000 || a:enable < 1000
+      let msg = "Warning: Timer value must be given in secods and can't be > 100*60*1000 or < 1000"
+    else
+      let g:autosave_timer = a:enable
+      let s:autosave_timer=timer_start(g:autosave_timer, 'Autosave_DoSave', {'repeat': -1})
+    endif
   elseif exists('s:autosave_timer')
     call timer_stop(s:autosave_timer)
   endif
+  if !empty(msg)
+    call <sid>MessOut(msg)
+  endif
 endfunc
 
-func! <sid>Warning(list) "{{{2
+func! <sid>MessOut(msg) abort "{{{2
+  echohl WarningMsg
+  if type(a:msg) == type([])
+    for item in a:msg | unsilent echomsg item | endfor
+  else
+    unsilent echomsg a:msg
+  endif
+  echohl Normal
+endfu
+
+func! <sid>Warning(list) abort "{{{2
   if empty(a:list)
     return
   endif
-  let msg = "autosave: The following files could not be written."
-	echohl WarningMsg
-	unsilent echomsg msg
-	for file in a:list | unsilent echomsg file | endfor
+  let list = ["AutoSave: The following files could not be written."] + a:list
+  <sid>MessOut(list)
 	sleep 1
-	echohl Normal
-	let v:errmsg = msg
+	let v:errmsg = list[0]
 endfun
 
-let g:autosave = get(g:, 'autosave', 1)
-call <sid>SetupTimer(g:autosave)
-
+call <sid>SetupTimer(g:autosave_timer)
 " Restore: "{{{1
 let &cpo=s:cpo
 unlet s:cpo
