@@ -11,7 +11,13 @@ in your `backupdir` setting with a default extensions of '.backup'
 Installation
 ---
 
-Use the plugin manager of your choice or use the new packadd command in Vim 8.
+Use the plugin manager of your choice.
+
+Alternatively, since Vim 8 includes a package manager by default, clone this repository below
+`~/.vim/pack/dist/start/`
+
+You should have a directory `~/.vim/pack/dist/start/vim-autosave`
+That directory will be loaded automatically by Vim.
 
 Usage
 ---
