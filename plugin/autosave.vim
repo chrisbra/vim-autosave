@@ -10,15 +10,13 @@
 "          instead of "Vim".
 "          No warranty, express or implied.
 "    *** ***   Use At-Your-Own-Risk!   *** ***
-" GetLatestVimScripts: ???? 1 :AutoInstall: vim-autosave.vim
-"
 " Init: {{{1
 let s:cpo= &cpo
 if exists("g:loaded_autosave") || &cp
     finish
-elseif !has('timers') || !has('float')
+elseif !has('timers')
     echohl WarningMsg
-    echomsg "The vim-autosave Plugin needs at least a Vim version 8 (with +timers and +float support)"
+    echomsg "The vim-autosave Plugin needs at least a Vim version 8 (with +timers)"
     echohl Normal
     finish
 endif
@@ -102,7 +100,7 @@ func! <sid>SaveBuffer(nr) abort "{{{2
 endfunc
 
 func! <sid>Num(nr) abort "{{{2
-  return (a:nr+0.0)/1000
+  return a:nr/1000
 endfu
 
 func! <sid>SetupTimer(enable) abort "{{{2
@@ -113,7 +111,7 @@ func! <sid>SetupTimer(enable) abort "{{{2
       if empty(info)
         let msg = 'AutoSave disabled'
       elseif info[0].callback is# function('Autosave_DoSave')
-        let msg  = printf("AutoSave: %s (every %.0f seconds), triggers again in %.0f seconds",
+        let msg  = printf("AutoSave: %s (every %d seconds), triggers again in %d seconds",
               \ (info[0].paused ? 'paused' : 'active'), <sid>Num(info[0].time),
               \ <sid>Num(info[0].remaining))
       else
@@ -124,7 +122,7 @@ func! <sid>SetupTimer(enable) abort "{{{2
     endif
   elseif a:enable
     if a:enable > 100 * 60 * 1000 || a:enable < 1000
-      let msg = "Warning: Timer value must be given in secods and can't be > 100*60*1000 or < 1000"
+      let msg = "Warning: Timer value must be given in millisecods and can't be > 100*60*1000 (100 minutes) or < 1000 (1 second)"
     else
       let g:autosave_timer = a:enable
       let s:autosave_timer=timer_start(g:autosave_timer, 'Autosave_DoSave', {'repeat': -1})
