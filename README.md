@@ -22,6 +22,7 @@ Here is a short overview of the functionality provided by the plugin:
     :EnableAutoSave     - Enable the plugin (by default every 5 minutes)
     :DisableAutoSave    - Disable the plugin
     :AutoSave <millis>  - Enable the plugin (every <millis> milliseconds)
+    :AutoSave           - Output status of the plugin
 
 ####Configuration variables (and defaults)
     :let g:autosave_extensions = '.backup'  - extension used for saving modified files
