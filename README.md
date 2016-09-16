@@ -4,16 +4,29 @@ vim-autosave
 
 This plugin uses timers to automatically save your work as temporary files.
 
+This makes use of the new timer functionality available with Vim 8.
+Backup files will be written (by default every 5 minutes if the buffer was changed)
+in your `backupdir` setting with a default extensions of '.backup' 
+
 Installation
 ---
 
-Use the plugin manager of your choice. Or download the [plugin][], edit it with Vim (`vim vim-autosave.vmb`) and simply source it (`:so %`). Restart and take a look at the help (`:h vim-autosave`)
-
-[plugin]: https://raw.github.com/chrisbra/vim-autosave/master/vim-autosavee.vmb
+Use the plugin manager of your choice or use the new packadd command in Vim 8.
 
 Usage
 ---
-Once installed, take a look at the help at `:h vim-autosave`
+Once installed, take a look at the help at `:h vim-autosave` (not yet available).
+
+Here is a short overview of the functionality provided by the plugin:
+####Ex commands:
+    :EnableAutoSave     - Enable the plugin (by default every 5 minutes)
+    :DisableAutoSave    - Disable the plugin
+    :AutoSave <millis>  - Enable the plugin (every <millis> milliseconds)
+
+####Configuration variables (and defaults)
+    :let g:autosave_extensions = '.backup'  - extension used for saving modified files
+    :let g:autosave_timer      = 60*5*1000  - number of milliseconds to trigger
+                                              (by default every 5 minutes)
 
 License & Copyright
 -------
