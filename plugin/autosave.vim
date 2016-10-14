@@ -5,7 +5,7 @@
 " Last Change: Thu, 05 Mar 2015 08:11:46 +0100
 " Script: http://www.vim.org/scripts/script.php?script_id=
 " Copyright:   (c) 2009-2016 by Christian Brabandt
-"          The VIM LICENSE applies to EnhancedDifff.vim
+"          The VIM LICENSE applies to vim-autosave.vim
 "          (see |copyright|) except use "vim-autosave"
 "          instead of "Vim".
 "          No warranty, express or implied.
