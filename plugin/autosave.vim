@@ -57,7 +57,6 @@ func! <sid>SaveBuffer(nr) abort "{{{2
   " 'autosave_disabled' has been set
   let bufname = bufname(a:nr + 0)
   if !getbufvar(a:nr, '&modified') ||
-  \  empty(bufname) ||
   \  !empty(getbufvar(a:nr, '&buftype')) ||
   \  getbufvar(a:nr, 'autosave_disabled', 0)
       return
@@ -72,6 +71,9 @@ func! <sid>SaveBuffer(nr) abort "{{{2
       let dir = fnamemodify(bufname, ':p:h')
     endif
     let filename = fnamemodify(bufname, ':t')
+    if empty(filename)
+      let filename='unnamed_buffer_'.strftime('%Y%m%d_%H%M').'.txt'
+    endif
     if !isdirectory(dir)
       continue
     endif
