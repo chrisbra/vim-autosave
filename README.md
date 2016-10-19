@@ -8,6 +8,8 @@ This makes use of the new timer functionality available with Vim 8.
 Backup files will be written (by default every 5 minutes if the buffer was changed)
 in your `backupdir` setting with a default extensions of '.backup' 
 
+Unnamed buffers will be saved as `'unnamed_buffer_<YYYYMMDD_HHMM>.txt.backup'`
+
 Installation
 ---
 
