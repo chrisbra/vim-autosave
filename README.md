@@ -34,8 +34,13 @@ Here is a short overview of the functionality provided by the plugin:
 
 ####Configuration variables (and defaults)
     :let g:autosave_extensions = '.backup'  - extension used for saving modified files
+    :let g:autosave_backup     = '~/.vim/backup' - directory where to save backup files
     :let g:autosave_timer      = 60*5*1000  - number of milliseconds to trigger
                                               (by default every 5 minutes)
+
+When `g:autosave_backup` is defined and the directory exists, the path of the
+saved buffer will be encoded into the filename, encoding directory separators by '=+'.
+
 
 License & Copyright
 -------
