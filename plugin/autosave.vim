@@ -28,7 +28,10 @@ let g:autosave_extension  = get(g:, 'autosave_extension', '.backup')
 " by default write every 5 minutes
 let g:autosave_timer      = get(g:, 'autosave_timer', 60*5) * 1000
 let g:autosave_changenr   = {}
-let g:autosave_backup     = '~/.vim/backup'
+" by default try to save in the first directory from your &rtp,
+" e.g. linux:   ~/.vim/backup
+"      windows: c:\users\vim\backup on windows
+let g:autosave_backup     = get(g:, 'autosave_backup', split(&rtp, ',')[0]. '/backup')
 
 " public interface {{{1
 com! -nargs=? AutoSave call <sid>SetupTimer(<q-args>)
