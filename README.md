@@ -26,13 +26,15 @@ Usage
 Once installed, take a look at the help at `:h vim-autosave` (not yet available).
 
 Here is a short overview of the functionality provided by the plugin:
-####Ex commands:
+### Ex commands:
+
     :EnableAutoSave     - Enable the plugin (by default every 5 minutes)
     :DisableAutoSave    - Disable the plugin
     :AutoSave <millis>  - Enable the plugin (every <millis> milliseconds)
     :AutoSave           - Output status of the plugin
 
-####Configuration variables (and defaults)
+### Configuration variables (and defaults)
+
     :let g:autosave_extensions = '.backup'  - extension used for saving modified files
     :let g:autosave_backup     = '~/.vim/backup' - directory where to save backup files
     :let g:autosave_timer      = 60*5*1000  - number of milliseconds to trigger
@@ -40,7 +42,6 @@ Here is a short overview of the functionality provided by the plugin:
 
 When `g:autosave_backup` is defined and the directory exists, the path of the
 saved buffer will be encoded into the filename, encoding directory separators by '=+'.
-
 
 License & Copyright
 -------
