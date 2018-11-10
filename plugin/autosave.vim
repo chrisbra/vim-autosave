@@ -26,7 +26,7 @@ let g:loaded_autosave = 1
 " Configuration variables {{{1
 let g:autosave_extension  = get(g:, 'autosave_extension', '.backup')
 " by default write every 5 minutes
-let g:autosave_timer      = get(g:, 'autosave_timer', 60*5) * 1000
+let g:autosave_timer      = get(g:, 'autosave_timer', 60*5*1000)
 let g:autosave_changenr   = {}
 " by default try to save in the first directory from your &rtp,
 " e.g. linux:   ~/.vim/backup
