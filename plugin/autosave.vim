@@ -126,12 +126,9 @@ func! <sid>SaveBuffer(nr) abort "{{{2
   let saved=0
   let bufname = bufname(a:nr + 0)
   for dir in g:autosave_backupdir
-    if empty(glob(dir))
-      call mkdir(dir, 'p')
-    endif
     let [dir, filename] = s:GetNames(dir, bufname)
     if !isdirectory(dir)
-      continue
+      call mkdir(dir, 'p')
     endif
     try
       let cnt = getbufline(a:nr, 1, '$')
