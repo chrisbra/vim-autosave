@@ -32,13 +32,27 @@ let g:autosave_changenr   = {}
 " e.g. linux:   ~/.vim/backup
 "      windows: c:\users\vim\backup on windows
 let g:autosave_backup     = get(g:, 'autosave_backup', split(&rtp, ',')[0]. '/backup')
+" if set, only allow to autosave particular buffers, that have been enabled
+" using: AutoSaveThisBuffer
+let g:autosave_include    = 0
 
 " public interface {{{1
 com! -nargs=? AutoSave call <sid>SetupTimer(<q-args>)
 com! DisableAutoSave AutoSave 0
 com! EnableAutoSave  AutoSave g:autosave_timer
+com! -bang AutoSaveThisBuffer call <sid>Autosave_this(<bang>0)
 
 " functions {{{1
+func! Autosave_this(bang)
+  if !a:bang
+    let g:autosave_include=1
+    let b:autosave_include=1
+  else
+    " Disable Autosaving this buffer
+    unlet! b:autosave_include
+  endif
+endfunc
+
 func! Autosave_DoSave(timer) abort "{{{2
   let bufnr=bufnr('')
   let g:autosave_backupdir=split(&bdir, '\\\@<!,')
@@ -47,9 +61,25 @@ func! Autosave_DoSave(timer) abort "{{{2
   call map(g:autosave_backupdir, 'substitute(v:val, ''\\,'', ",", "g")')
   call extend(g:autosave_backupdir, [g:autosave_backup], 0)
   call map(g:autosave_backupdir, 'expand(v:val)')
+  " test if only autosave included buffers should be saved
+  let include=[]
   for nr in range(1, bufnr('$'))
-    call <sid>SaveBuffer(nr)
+    if getbufvar(nr, 'autosave_include', 0)
+      call add(include, nr)
+    endif
   endfor
+  " only save specific buffers
+  if empty(include)
+    for nr in range(1, bufnr('$'))
+      call <sid>SaveBuffer(nr)
+    endfor
+    let g:autosave_include=0
+  else
+    " only save specific buffers
+    for nr in include
+      call <sid>SaveBuffer(nr)
+    endfor
+  endif
   call <sid>Warning(g:autosave_errors)
 endfunc
 
