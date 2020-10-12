@@ -43,7 +43,7 @@ com! EnableAutoSave  AutoSave g:autosave_timer
 com! -bang AutoSaveThisBuffer call <sid>Autosave_this(<bang>0)
 
 " functions {{{1
-func! Autosave_this(bang)
+func! Autosave_this(bang) "{{{2
   if !a:bang
     let g:autosave_include=1
     let b:autosave_include=1
