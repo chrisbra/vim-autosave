@@ -147,6 +147,7 @@ func! <sid>SaveBuffer(nr) abort "{{{2
       let g:autosave_changenr[a:nr+0] = getbufvar(a:nr+0, 'changedtick')
       break
     catch
+      call add(g:autosave_errors, v:exception)
     endtry
   endfor
   if !saved
