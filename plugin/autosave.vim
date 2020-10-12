@@ -24,7 +24,6 @@ set cpo&vim
 let g:loaded_autosave = 1
 
 " Configuration variables {{{1
-let g:autosave_extension  = get(g:, 'autosave_extension', '.backup')
 " by default write every 5 minutes
 let g:autosave_timer      = get(g:, 'autosave_timer', 60*5*1000)
 let g:autosave_changenr   = {}
@@ -35,6 +34,10 @@ let g:autosave_backup     = get(g:, 'autosave_backup', split(&rtp, ',')[0]. '/ba
 " if set, only allow to autosave particular buffers, that have been enabled
 " using: AutoSaveThisBuffer
 let g:autosave_include    = 0
+" timestamp each backup file
+let g:autosave_timestamp  = 1
+" keep that many number of copies (per file)
+let g:autosave_max_copies = 20
 
 " public interface {{{1
 com! -nargs=? AutoSave call <sid>SetupTimer(<q-args>)
@@ -87,9 +90,18 @@ func! <sid>GetNames(dir, bufname) "{{{2
   " Returns the final buffername and the directory where to save it
   let filename = fnamemodify(a:bufname, ':t')
   let dir = a:dir
+  let timestamp = strftime('%Y%m%d_%H%M')
 
   if empty(filename)
-    let filename='unnamed_buffer_'.strftime('%Y%m%d_%H%M').'.txt'
+    let filename='unnamed_buffer_'.timestamp.'.txt'
+  endif
+  " Add timestamp to the filename
+  if get(g:, 'autosave_timestamp', 1)
+    if filename =~ '\.\w\{1,3}$'
+      let filename = substitute(filename, '\.\(\w\{1,3}\)$', '_'.timestamp.'.'. submatch(1), '')
+    else
+      let filename = filename . '_'.timestamp
+    endif
   endif
 
   let prefix = fnamemodify(a:bufname, ':p:h')
@@ -132,7 +144,20 @@ func! <sid>SaveBuffer(nr) abort "{{{2
     endif
     try
       let cnt = getbufline(a:nr, 1, '$')
-      let name = dir. '/'. fnameescape(filename). g:autosave_extension
+      let name = dir. '/'. fnameescape(filename)
+      let existing = sort(readdir(dir, {n -> n =~ bufname}), 'N')
+      let num_copies = len(existing)
+      let max_copies = get(g:, 'autosave_max_copies')
+      if num_copies > max_copies
+        " remove the oldest copies
+        for range(num_copies - max_copies)
+          let item = remove(existins, 0)
+          call delete(dir. '/'. item)
+          if get(g:, 'autosave_debug', 0)
+            echomsg printf("removed oldest item '%s' in dir '%s'", item, dir)
+          endif
+        endfor
+      endif
       if getbufvar(a:nr, '&ff') is# 'unix'
         " write as unix file
         call writefile(cnt, name)
