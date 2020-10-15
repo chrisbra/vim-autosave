@@ -150,8 +150,8 @@ func! <sid>SaveBuffer(nr) abort "{{{2
       let max_copies = get(g:, 'autosave_max_copies')
       if num_copies > max_copies
         " remove the oldest copies
-        for range(num_copies - max_copies)
-          let item = remove(existins, 0)
+        for v in range(num_copies - max_copies)
+          let item = remove(existing, 0)
           call delete(dir. '/'. item)
           if get(g:, 'autosave_debug', 0)
             echomsg printf("removed oldest item '%s' in dir '%s'", item, dir)
