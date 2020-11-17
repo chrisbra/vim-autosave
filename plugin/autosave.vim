@@ -113,7 +113,7 @@ func! <sid>GetNames(dir, bufname) "{{{2
   let prefix = substitute(prefix, '/', '=+', 'g'). '=+'
 
   if dir is# '.'
-    let dir = prefix
+    let dir = '.'
   else
     let filename = prefix.filename
   endif
