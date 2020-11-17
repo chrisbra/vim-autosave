@@ -107,6 +107,7 @@ func! <sid>GetNames(dir, bufname) "{{{2
 
   let prefix = fnamemodify(a:bufname, ':p:h')
   if has("win32") || has("win64")
+    let prefix = substitute(prefix, ':', '', 'g')
     let prefix = substitute(prefix, '\\', '/', 'g')
   endif
   let prefix = substitute(prefix, '/', '=+', 'g'). '=+'
