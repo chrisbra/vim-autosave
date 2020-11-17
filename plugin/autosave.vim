@@ -89,7 +89,6 @@ endfunc
 func! <sid>GetNames(dir, bufname) "{{{2
   " Returns the final buffername and the directory where to save it
   let filename = fnamemodify(a:bufname, ':t')
-  let dir = a:dir
   let timestamp = strftime('%Y%m%d_%H%M')
 
   if empty(filename)
@@ -103,22 +102,21 @@ func! <sid>GetNames(dir, bufname) "{{{2
     else
       let filename = filename . '_'.timestamp
     endif
+    return filename
   endif
 
   let prefix = fnamemodify(a:bufname, ':p:h')
   if has("win32") || has("win64")
     let prefix = substitute(prefix, ':', '', 'g')
-    let prefix = substitute(prefix, '\\', '/', 'g')
+    let prefix = substitute(prefix, '\\', '=+', 'g')
   endif
   let prefix = substitute(prefix, '/', '=+', 'g'). '=+'
 
-  if dir is# '.'
-    let dir = '.'
-  else
+  if a:dir isnot# '.'
     let filename = prefix.filename
   endif
 
-  return [dir, filename]
+  return filename
 endfunc
 func! <sid>SaveBuffer(nr) abort "{{{2
   if !bufexists(a:nr)
@@ -140,7 +138,7 @@ func! <sid>SaveBuffer(nr) abort "{{{2
   let saved=0
   let bufname = bufname(a:nr + 0)
   for dir in g:autosave_backupdir
-    let [dir, filename] = s:GetNames(dir, bufname)
+    let filename = s:GetNames(dir, bufname)
     if !isdirectory(dir)
       call mkdir(dir, 'p')
     endif
