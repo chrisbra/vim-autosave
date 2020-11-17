@@ -95,7 +95,7 @@ func! <sid>GetNames(dir, bufname) "{{{2
     let filename='unnamed_buffer_'.timestamp.'.txt'
   endif
   " Add timestamp to the filename
-  if get(g:, 'autosave_timestamp', 1)
+  if get(g:, 'autosave_timestamp', 1) || a:dir is# '.'
     " file extensions could be 1, 2, 3, or 4 characters (*.h, *.cc, *.cpp, *.html)
     if filename =~ '\.\w\{1,4}$'
       let filename = substitute(filename, '\.\(\w\{1,3}\)$', '_'.timestamp.'.'. submatch(1), '')
