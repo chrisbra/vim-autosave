@@ -98,7 +98,7 @@ func! <sid>GetNames(dir, bufname) "{{{2
   if get(g:, 'autosave_timestamp', 1) || a:dir is# '.'
     " file extensions could be 1, 2, 3, or 4 characters (*.h, *.cc, *.cpp, *.html)
     if filename =~ '\.\w\{1,4}$'
-      let filename = substitute(filename, '\.\(\w\{1,3}\)$', '_'.timestamp.'.'. submatch(1), '')
+      let filename = substitute(filename, '\.\(\w\{1,4}\)$', '\="_".timestamp.".". submatch(1)', '')
     else
       let filename = filename . '_'.timestamp
     endif
