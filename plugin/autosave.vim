@@ -57,33 +57,43 @@ func! Autosave_this(bang) "{{{2
 endfunc
 
 func! Autosave_DoSave(timer) abort "{{{2
-  let bufnr=bufnr('')
-  let g:autosave_backupdir=split(&bdir, '\\\@<!,')
-  let g:autosave_errors=[]
-  " replace escaped commas with commas
-  call map(g:autosave_backupdir, 'substitute(v:val, ''\\,'', ",", "g")')
-  call extend(g:autosave_backupdir, [g:autosave_backup], 0)
-  call map(g:autosave_backupdir, 'expand(v:val)')
-  " test if only autosave included buffers should be saved
-  let include=[]
-  for nr in range(1, bufnr('$'))
-    if getbufvar(nr, 'autosave_include', 0)
-      call add(include, nr)
-    endif
-  endfor
-  " only save specific buffers
-  if empty(include)
-    for nr in range(1, bufnr('$'))
-      call <sid>SaveBuffer(nr)
-    endfor
-    let g:autosave_include=0
-  else
-    " only save specific buffers
-    for nr in include
-      call <sid>SaveBuffer(nr)
-    endfor
+  let skip_condition = ''
+  if exists("*state")
+    let skip_condition = "state('moaxw')"
   endif
-  call <sid>Warning(g:autosave_errors)
+
+  if empty(skip_condition) || empty(eval(skip_condition))
+    let bufnr=bufnr('')
+    let g:autosave_backupdir=split(&bdir, '\\\@<!,')
+    let g:autosave_errors=[]
+    " replace escaped commas with commas
+    call map(g:autosave_backupdir, 'substitute(v:val, ''\\,'', ",", "g")')
+    if exists("g:autosave_backup")
+      call extend(g:autosave_backupdir, [g:autosave_backup], 0)
+    endif
+    call map(g:autosave_backupdir, 'expand(v:val)')
+
+    " test if only autosave included buffers should be saved
+    let include=[]
+    for nr in range(1, bufnr('$'))
+      if getbufvar(nr, 'autosave_include', 0)
+        call add(include, nr)
+      endif
+    endfor
+    " only save specific buffers
+    if empty(include)
+      for nr in range(1, bufnr('$'))
+        call <sid>SaveBuffer(nr)
+      endfor
+      let g:autosave_include=0
+    else
+      " only save specific buffers
+      for nr in include
+        call <sid>SaveBuffer(nr)
+      endfor
+    endif
+    call <sid>Warning(g:autosave_errors)
+  endif
 endfunc
 
 func! <sid>GetNames(dir, bufname) "{{{2
