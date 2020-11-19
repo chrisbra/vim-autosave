@@ -241,7 +241,7 @@ func! <sid>Warning(list) abort "{{{2
     return
   endif
   let list = ["AutoSave: The following files could not be written."] + a:list
-  <sid>MessOut(list)
+  call <sid>MessOut(list)
 	sleep 1
 	let v:errmsg = list[0]
 endfun
