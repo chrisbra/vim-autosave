@@ -202,9 +202,14 @@ func! <sid>SetupTimer(enable) abort "{{{2
       if empty(info)
         let msg = 'AutoSave disabled'
       elseif info[0].callback is# function('Autosave_DoSave')
-        let msg  = printf("AutoSave: %s (every %d seconds), triggers again in %d seconds",
-              \ (info[0].paused ? 'paused' : 'active'), <sid>Num(info[0].time),
-              \ <sid>Num(info[0].remaining))
+        if has('nvim')
+          let msg  = printf("AutoSave: %s (every %d seconds)",
+                \ (info[0].paused ? 'paused' : 'active'), <sid>Num(info[0].time))
+        else
+          let msg  = printf("AutoSave: %s (every %d seconds), triggers again in %d seconds",
+                \ (info[0].paused ? 'paused' : 'active'), <sid>Num(info[0].time),
+                \ <sid>Num(info[0].remaining))
+        endif
       else
         let msg = printf("Unknown timer")
       endif
