@@ -37,7 +37,7 @@ let g:autosave_include    = 0
 " timestamp each backup file
 let g:autosave_timestamp  = 1
 " keep that many number of copies (per file)
-let g:autosave_max_copies = 20
+let g:autosave_max_copies = get(g:, 'autosave_max_copies', 20)
 
 " public interface {{{1
 com! -nargs=? AutoSave call <sid>SetupTimer(<q-args>)
