@@ -76,11 +76,14 @@ func! Autosave_DoSave(timer) abort "{{{2
     " test if only autosave included buffers should be saved
     let include=[]
     for nr in range(1, bufnr('$'))
-      if getbufvar(nr, 'autosave_include', 0)
+      if get(g:, 'autosave_backup_max_filesize', getfsize(bufname(nr))) >= getfsize(bufname(nr))
+        call add(include, nr)
+      elseif get(g:, 'autosave_only_text', 99) > getbufvar(nr, '&bin')
+        call add(include, nr)
+      elseif getbufvar(nr, 'autosave_include', 0)
         call add(include, nr)
       endif
     endfor
-    " only save specific buffers
     if empty(include)
       for nr in range(1, bufnr('$'))
         call <sid>SaveBuffer(nr)
